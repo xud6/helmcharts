@@ -58,6 +58,14 @@ spec:
             - name: vncport
               containerPort: 9000
               protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: vncport
+          readinessProbe:
+            httpGet:
+              path: /
+              port: vncport
           volumeMounts:
           - mountPath: /home/user/coolq
             name: data
