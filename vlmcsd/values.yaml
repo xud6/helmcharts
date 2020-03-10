@@ -12,14 +12,6 @@ image:
 nameOverride: ""
 fullnameOverride: ""
 
-lb:
-  useExistLb: true
-  # if useExistLb false
-  releaseSubnet: subnet-3a061x3z
-  
-# if useExistLb true
-LB_EXIST_LB_ID: lb-6swtxxxx
-
 service:
   type: LoadBalancer
   port: 1688
