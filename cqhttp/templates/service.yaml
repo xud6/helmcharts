@@ -18,6 +18,10 @@ spec:
       targetPort: apiport
       protocol: TCP
       name: apiport
+    - port: {{ .Values.service.wsapiport }}
+      targetPort: wsapiport
+      protocol: TCP
+      name: wsapiport
     - port: {{ .Values.service.vncport }}
       targetPort: vncport
       protocol: TCP

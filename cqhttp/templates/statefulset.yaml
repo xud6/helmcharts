@@ -58,6 +58,9 @@ spec:
             - name: vncport
               containerPort: 9000
               protocol: TCP
+            - name: wsapiport
+              containerPort: 6700
+              protocol: TCP
           livenessProbe:
             httpGet:
               path: /

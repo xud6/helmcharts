@@ -15,6 +15,7 @@ fullnameOverride: ""
 service:
   type: LoadBalancer
   apiport: 5700
+  wsapiport: 6700
   vncport: 9000
 
 persistence:
