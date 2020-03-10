@@ -62,7 +62,8 @@ spec:
           readinessProbe:
             httpGet:
               path: /
-              port: apiportvolumeMounts:
+              port: apiport
+          volumeMounts:
           - mountPath: /home/user/coolq
             name: data
           resources:
