@@ -1,0 +1,43 @@
+# Default values for vlmcsd.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: mikolatero/vlmcsd
+  tag: latest
+  pullPolicy: Always
+
+nameOverride: ""
+fullnameOverride: ""
+
+lb:
+  useExistLb: true
+  # if useExistLb false
+  releaseSubnet: subnet-3a061x3z
+  
+# if useExistLb true
+LB_EXIST_LB_ID: lb-6swtxxxx
+
+service:
+  type: LoadBalancer
+  port: 1688
+
+resources: 
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  limits:
+  #  cpu: 100m
+    memory: 32Mi
+  requests:
+  #  cpu: 100m
+    memory: 8Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
