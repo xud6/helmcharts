@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Service
+metadata:
+{{- with .Values.annotations }}
+  annotations:
+{{ toYaml . | indent 4 }}
+{{- end }}
+  name: {{ include "cqhttp.fullname" . }}
+  labels:
+    app: {{ include "cqhttp.name" . }}
+    chart: {{ include "cqhttp.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.apiport }}
+      targetPort: apiport
+      protocol: TCP
+      name: apiport
+    - port: {{ .Values.service.vncport }}
+      targetPort: vncport
+      protocol: TCP
+      name: vncport
+  selector:
+    app: {{ include "cqhttp.name" . }}
+    release: {{ .Release.Name }}

@@ -1,0 +1,111 @@
+apiVersion: apps/v1beta2
+kind: StatefulSet
+metadata:
+  name: {{ include "cqhttp.fullname" . }}
+  labels:
+    app: {{ include "cqhttp.name" . }}
+    chart: {{ include "cqhttp.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "cqhttp.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "cqhttp.name" . }}
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          env:
+          {{- with .Values.COOLQ_ACCOUNT }}
+          - name: COOLQ_ACCOUNT
+            value: {{ . | quote }}
+          {{- end }}
+          {{- with .Values.CQHTTP_POST_URL }}
+          - name: CQHTTP_POST_URL
+            value: {{ . | quote }}
+          {{- end }}
+          {{- with .Values.CQHTTP_SERVE_DATA_FILES }}
+          - name: CQHTTP_SERVE_DATA_FILES
+            value: {{ . | quote }}
+          {{- end }}
+          {{- with .Values.VNC_PASSWD }}
+          - name: VNC_PASSWD
+            value: {{ . | quote }}
+          {{- end }}
+          {{- with .Values.FORCE_ENV }}
+          - name: FORCE_ENV
+            value: {{ . | quote }}
+          {{- end }}
+          {{- with .Values.CQHTTP_USE_WS }}
+          - name: CQHTTP_USE_WS
+            value: {{ . | quote }}
+          {{- end }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: apiport
+              containerPort: 5700
+              protocol: TCP
+            - name: vncport
+              containerPort: 9000
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: apiport
+          readinessProbe:
+            httpGet:
+              path: /
+              port: apiportvolumeMounts:
+          - mountPath: /home/user/coolq
+            name: data
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+      volumes:
+{{- if not .Values.persistence.enabled }}
+        - name: data
+          emptyDir: {}
+{{- else if .Values.persistence.existingClaim }}
+        - name: data
+          persistentVolumeClaim:
+{{- with .Values.persistence.existingClaim }}
+            claimName: {{ tpl . $ }}
+{{- end }}
+{{- else }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      {{- with .Values.persistence.annotations }}
+        annotations:
+        {{- range $key, $value := . }}
+          {{ $key }}: {{ $value }}
+        {{- end }}
+      {{- end }}
+      spec:
+        accessModes:
+        {{- range .Values.persistence.accessModes }}
+          - {{ . | quote }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.persistence.size | quote }}
+        {{ include "cqhttp.storageClass" . | nindent 8 }}
+{{- end }}
